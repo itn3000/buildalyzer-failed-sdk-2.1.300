@@ -1,0 +1,7 @@
+FROM microsoft/dotnet:2.0-sdk
+
+ADD . /buildalyzer-sdktest
+
+WORKDIR /buildalyzer-sdktest/buildalyzertest
+
+CMD ["dotnet","run","--","../sampleclass/sampleclass.csproj"]
