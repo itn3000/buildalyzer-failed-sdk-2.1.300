@@ -3,6 +3,7 @@ using System.Linq;
 using Buildalyzer;
 using Microsoft.Build;
 using Microsoft.Build.Framework;
+using System.IO;
 
 namespace buildalyzertest
 {
@@ -12,6 +13,17 @@ namespace buildalyzertest
         {
             try
             {
+                System.Runtime.Loader.AssemblyLoadContext.Default.Resolving += (ctx, name) =>
+                {
+                    Console.WriteLine($"asm name={name}");
+                    return null;
+                };
+                // another workaround, read required assemblies before compile.
+                foreach(var dllname in new string[]{"NuGet.Versioning", "NuGet.Common","NuGet.Frameworks"})
+                {
+                    const string sdkdir = @"C:\Program Files\dotnet\sdk\2.1.300";
+                    System.Runtime.Loader.AssemblyLoadContext.Default.LoadFromAssemblyPath(Path.Combine(sdkdir, $"{dllname}.dll"));
+                }
                 var manageropts = new AnalyzerManagerOptions();
                 manageropts.LogWriter = Console.Out;
                 manageropts.LoggerVerbosity = LoggerVerbosity.Normal;
